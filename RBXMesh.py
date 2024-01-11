@@ -1,6 +1,6 @@
 """
-    A lightweight Python Library for parsing and exporting the Roblox Mesh Format
-    Written by PrintedScript on 21/9/2023 | https://github.com/PrintedScript/RBXMesh
+    Python Library for reading and writing Roblox mesh files.
+    Written by something.else on 21/9/2023
 
     Supported meshes up to version 5.
     Mesh Format documentation by MaximumADHD: https://devforum.roblox.com/t/roblox-mesh-format/326114
@@ -649,7 +649,7 @@ def read_mesh_v1( data : bytearray, offset : int, scale : int = 0.5, invertUV : 
             vertPos[0] * scale, vertPos[1] * scale, vertPos[2] * scale,
             vertNorm[0], vertNorm[1], vertNorm[2],
             # Version 1.0 has the UVs inverted, it was only fixed in 1.1
-            vertUV[0], int(( 1 - vertUV[1] ) if invertUV else vertUV[1]), int(vertUV[2]),
+            vertUV[0], float(( 1 - vertUV[1] ) if invertUV else vertUV[1]), int(vertUV[2]),
 
             0, 0, 0, 0, 0, 0, 0 
         ))
