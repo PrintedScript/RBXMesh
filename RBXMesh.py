@@ -1,5 +1,5 @@
 """
-	https://github.com/PrintedScript/RBXMesh/blob/main/RBXMesh.py
+    https://github.com/PrintedScript/RBXMesh/blob/main/RBXMesh.py
     Python Library for reading and writing Roblox mesh files.
     Written by something.else on 21/9/2023
 
@@ -332,8 +332,10 @@ class FileMeshHeaderV4:
 
         self.sizeof_MeshHeader = int.from_bytes(data[0:2], "little")
         if self.sizeof_MeshHeader != 24:
-            raise Exception(f"FileMeshHeaderV4.read_data: invalid sizeof_MeshHeader ({
-                            self.sizeof_MeshHeader})")
+            raise Exception(
+                "FileMeshHeaderV4.read_data: invalid sizeof_MeshHeader (%d)" %
+                (self.sizeof_MeshHeader)
+            )
         self.lodType = int.from_bytes(data[2:4], "little")
         self.numVerts = int.from_bytes(data[4:8], "little")
         self.numFaces = int.from_bytes(data[8:12], "little")
@@ -571,8 +573,10 @@ class FileMeshHeaderV5:
 
         self.sizeof_MeshHeader = int.from_bytes(data[0:2], "little")
         if self.sizeof_MeshHeader != 32:
-            raise Exception(f"FileMeshHeaderV5.read_data: invalid sizeof_MeshHeader ({
-                            self.sizeof_MeshHeader})")
+            raise Exception(
+                "FileMeshHeaderV5.read_data: invalid sizeof_MeshHeader (%d)" %
+                (self.sizeof_MeshHeader)
+            )
         self.lodType = int.from_bytes(data[2:4], "little")
         self.numVerts = int.from_bytes(data[4:8], "little")
         self.numFaces = int.from_bytes(data[8:12], "little")
@@ -673,8 +677,8 @@ def read_mesh_v1(data_bytes: bytes, offset: int, scale: float = 0.5, invertUV: b
     allVectorStrs: list[str] = data[startingIndex:].split("]")
     allVectors: list[list[float]] = []
 
-    for i in range(0, len(allVectors)):
-        vector: str = allVectorStrs[i].strip()
+    for vecStr in allVectorStrs:
+        vector: str = vecStr.strip()
         vector = vector.replace("[", "").replace("]", "")
         if vector == "":
             continue
@@ -683,12 +687,13 @@ def read_mesh_v1(data_bytes: bytes, offset: int, scale: float = 0.5, invertUV: b
 
         if len(vector_floats) != 3:
             raise Exception(f"read_mesh_v1: invalid vector3 ({vector})")
-        # debug_print(f"read_mesh_v1: allVectors[{i}]={vector_floats}")
         allVectors.append(vector_floats)
 
     if len(allVectors) != numFaces * 9:
-        raise Exception(f"read_mesh_v1: invalid number of verticies ({
-                        len(allVectors)}), expected {numFaces * 9}")
+        raise Exception(
+            "read_mesh_v1: invalid number of verticies (%d), expected %d" %
+            (len(allVectors), numFaces * 9)
+        )
 
     for i in range(0, len(allVectors), 3):
         vertPos: list[float] = allVectors[i]
@@ -711,8 +716,10 @@ def read_mesh_v1(data_bytes: bytes, offset: int, scale: float = 0.5, invertUV: b
         meshData.faces.append(FileMeshFace(i * 3, i * 3 + 1, i * 3 + 2))
         debug_print(f"read_mesh_v1: faces[{i}]={meshData.faces[i]}")
 
-    debug_print(f"read_mesh_v1: read {len(meshData.vnts)} vertices and {
-                len(meshData.faces)} faces successfully")
+    debug_print(
+        "read_mesh_v1: read %d vertices and %d faces successfully" %
+        (len(meshData.vnts), len(meshData.faces))
+    )
     return meshData
 
 
@@ -753,11 +760,15 @@ def read_mesh_v2(data: bytes, offset: int) -> FileMeshData:
     offset += meshHeader.num_faces * meshHeader.cbFaceStride
 
     if offset != len(data):
-        raise Exception(f"read_mesh_v2: unexpected data at end of file ({
-                        len(data) - offset} bytes)")
+        raise Exception(
+            "read_mesh_v2: unexpected data at end of file (%d bytes)" %
+            (len(data) - offset)
+        )
 
-    debug_print(f"read_mesh_v2: read {len(meshData.vnts)} vertices and {
-                len(meshData.faces)} faces successfully")
+    debug_print(
+        "read_mesh_v2: read %d vertices and %d faces successfully" %
+        (len(meshData.vnts), len(meshData.faces))
+    )
     return meshData
 
 
@@ -799,16 +810,22 @@ def read_mesh_v3(data: bytes, offset: int) -> FileMeshData:
     if len(meshLODs) > 1:
         meshData.full_faces = meshData.faces
         meshData.faces = meshData.faces[0:meshLODs[1]]
-        debug_print(f"read_mesh_v3: only keeping {
-                    meshLODs[1]}/{meshHeader.num_faces} faces")
+        debug_print(
+            f"read_mesh_v3: only keeping %d/%d faces" %
+            (meshLODs[1], meshHeader.num_faces)
+        )
     meshData.LODs = meshLODs
 
     if offset != len(data):
-        raise Exception(f"read_mesh_v3: unexpected data at end of file ({
-                        len(data) - offset} bytes)")
+        raise Exception(
+            "read_mesh_v3: unexpected data at end of file (%d bytes)"
+            % (len(data) - offset)
+        )
 
-    debug_print(f"read_mesh_v3: read {len(meshData.vnts)} vertices and {
-                len(meshData.faces)} faces successfully")
+    debug_print(
+        "read_mesh_v3: read %d vertices and %d faces successfully" %
+        (len(meshData.vnts), len(meshData.faces))
+    )
     return meshData
 
 
@@ -837,8 +854,10 @@ def read_mesh_v4(data: bytes, offset: int) -> FileMeshData:
             meshData.envelopes.append(Envelope([], []))
             meshData.envelopes[i].read_data(read_data(data, offset + i * 8, 8))
 
-            debug_print(f"read_mesh_v4: envelopes[{i}]={
-                        meshData.envelopes[i]}")
+            debug_print(
+                "read_mesh_v4: envelopes[%d]=%s" %
+                (i, meshData.envelopes[i])
+            )
         offset += meshHeader.numVerts * 8
 
     for i in range(0, meshHeader.numFaces):
@@ -859,8 +878,10 @@ def read_mesh_v4(data: bytes, offset: int) -> FileMeshData:
     if len(meshLODs) > 1:
         meshData.full_faces = meshData.faces
         meshData.faces = meshData.faces[0:meshLODs[1]]
-        debug_print(f"read_mesh_v4: only keeping {
-                    meshLODs[1]}/{meshHeader.numFaces} faces")
+        debug_print(
+            "read_mesh_v4: only keeping %d/%d faces" %
+            (meshLODs[1], meshHeader.numFaces)
+        )
     meshData.LODs = meshLODs
 
     if meshHeader.numBones > 0:
@@ -888,11 +909,15 @@ def read_mesh_v4(data: bytes, offset: int) -> FileMeshData:
     offset += meshHeader.unused
 
     if offset != len(data):
-        raise Exception(f"read_mesh_v4: unexpected data at end of file ({
-                        len(data) - offset} bytes)")
+        raise Exception(
+            "read_mesh_v4: unexpected data at end of file (%d bytes)" %
+            (len(data) - offset)
+        )
 
-    debug_print(f"read_mesh_v4: read {len(meshData.vnts)} vertices and {
-                len(meshData.faces)} faces successfully")
+    debug_print(
+        "read_mesh_v4: read {len(meshData.vnts)} vertices and %d faces successfully" %
+        (len(meshData.faces))
+    )
     return meshData
 
 
@@ -940,8 +965,10 @@ def read_mesh_v5(data: bytes, offset: int) -> FileMeshData:
     if len(meshLODs) > 1:
         meshData.full_faces = meshData.faces
         meshData.faces = meshData.faces[0:meshLODs[1]]
-        debug_print(f"read_mesh_v5: only keeping {
-                    meshLODs[1]}/{meshHeader.numFaces} faces")
+        debug_print(
+            "read_mesh_v5: only keeping %d/%d faces" %
+            (meshLODs[1], meshHeader.numFaces)
+        )
     meshData.LODs = meshLODs
 
     if meshHeader.numBones > 0:
@@ -971,11 +998,15 @@ def read_mesh_v5(data: bytes, offset: int) -> FileMeshData:
     offset += meshHeader.facsDataSize  # No way I am doing allat
 
     if offset != len(data):
-        raise Exception(f"read_mesh_v5: unexpected data at end of file ({
-                        len(data) - offset} bytes)")
+        raise Exception(
+            "read_mesh_v5: unexpected data at end of file (%d bytes)" %
+            (len(data) - offset)
+        )
 
-    debug_print(f"read_mesh_v5: read {len(meshData.vnts)} vertices and {
-                len(meshData.faces)} faces successfully")
+    debug_print(
+        "read_mesh_v5: read %d vertices and %d faces successfully" %
+        (len(meshData.vnts), len(meshData.faces))
+    )
     return meshData
 
 
