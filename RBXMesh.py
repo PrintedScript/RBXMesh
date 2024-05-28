@@ -1049,7 +1049,7 @@ def export_mesh_v3(meshData: FileMeshData) -> bytes:
         40,
         12,
         4,
-        len(meshData.LODs),
+        max( len(meshData.LODs), 2 ), # There has to be at least two LODs ( [0, 1234] ) if not ROBLOX will complain about an empty mesh
         len(meshData.vnts),
         len(meshData.full_faces) if len(meshData.LODs) > 1 and len(
             meshData.full_faces) > len(meshData.faces) else len(meshData.faces),
@@ -1065,8 +1065,12 @@ def export_mesh_v3(meshData: FileMeshData) -> bytes:
         for i in range(0, len(meshData.faces)):
             finalmesh += meshData.faces[i].export_data()
 
-    for i in range(0, len(meshData.LODs)):
-        finalmesh += meshData.LODs[i].to_bytes(4, "little")
+    if len(meshData.LODs) > 1:
+        for i in range(0, len(meshData.LODs)):
+            finalmesh += meshData.LODs[i].to_bytes(4, "little")
+    else:
+        finalmesh += (0).to_bytes(4, "little")
+        finalmesh += ( len(meshData.faces) ).to_bytes(4, "little")
 
     return finalmesh
 
